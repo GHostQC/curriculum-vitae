@@ -61,6 +61,16 @@ jobs:
             build-info.json
           retention-days: 30
 
+      - name: Create deployment directory
+        run: |
+          mkdir -p deploy
+          cp index.html deploy/
+          cp *.pdf deploy/
+          cp build-info.json deploy/
+          cp .nojekyll deploy/
+          echo "Deployment directory created:"
+          ls -lh deploy/
+
       - name: Commit and push updated PDFs
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         run: |
@@ -68,11 +78,11 @@ jobs:
           git config user.email "actions@github.com"
           
           # Check if there are changes
-          if git diff --quiet --exit-code; then
-            echo "No changes to commit"
+          if git diff --quiet --exit-code *.pdf; then
+            echo "No PDF changes to commit"
           else
             git add *.pdf build-info.json
-            git commit -m "Update PDFs from LaTeX source [skip ci]"
+            git commit -m "Update PDFs from LaTeX source [skip ci]" || echo "No changes to commit"
             git push
           fi
 
@@ -80,7 +90,7 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: actions/upload-pages-artifact@v2
         with:
-          path: '.'
+          path: 'deploy'
 
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
