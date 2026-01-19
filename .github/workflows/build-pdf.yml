@@ -4,18 +4,7 @@ on:
   push:
     branches:
       - main
-    paths:
-      - 'sections/**'
-      - 'devops_*.tex'
-      - 'Makefile'
-      - '.github/workflows/build-pdf.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'sections/**'
-      - 'devops_*.tex'
-      - 'Makefile'
+  workflow_dispatch:
 
 jobs:
   build:
