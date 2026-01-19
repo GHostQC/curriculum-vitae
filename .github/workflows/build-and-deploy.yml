@@ -1,0 +1,62 @@
+name: Build LaTeX PDFs and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full latexmk
+
+      - name: Build PDFs
+        run: |
+          make clean
+          make all
+          ls -lh *.pdf
+
+      - name: Create deployment files
+        run: |
+          mkdir -p _deploy
+          cp index.html _deploy/
+          cp *.pdf _deploy/
+          cp .nojekyll _deploy/
+          echo "Files ready for deployment:"
+          ls -lh _deploy/
+
+      - name: Commit and push PDFs
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          if git diff --quiet *.pdf; then
+            echo "No PDF changes"
+          else
+            git add *.pdf
+            git commit -m "build: regenerate PDFs" || true
+            git push || true
+          fi
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '_deploy'
+
+      - name: Deploy to Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
