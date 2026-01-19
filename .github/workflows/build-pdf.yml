@@ -1,0 +1,101 @@
+name: Build PDFs and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'sections/**'
+      - 'devops_*.tex'
+      - 'Makefile'
+      - '.github/workflows/build-pdf.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'sections/**'
+      - 'devops_*.tex'
+      - 'Makefile'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up LaTeX
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y texlive-full latexmk
+
+      - name: Build PDFs
+        run: |
+          make clean
+          make all
+          echo "Build completed successfully"
+          ls -lh *.pdf
+
+      - name: Generate build info
+        run: |
+          cat > build-info.json << EOF
+          {
+            "timestamp": "$(date -u +'%Y-%m-%dT%H:%M:%SZ')",
+            "commit": "${{ github.sha }}",
+            "ref": "${{ github.ref }}"
+          }
+          EOF
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: PDFs
+          path: |
+            *.pdf
+            build-info.json
+          retention-days: 30
+
+      - name: Commit and push updated PDFs
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          
+          # Check if there are changes
+          if git diff --quiet --exit-code; then
+            echo "No changes to commit"
+          else
+            git add *.pdf build-info.json
+            git commit -m "Update PDFs from LaTeX source [skip ci]"
+            git push
+          fi
+
+      - name: Deploy to GitHub Pages
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: '.'
+
+  deploy:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
