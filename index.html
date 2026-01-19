@@ -177,7 +177,7 @@
                 <span class="description">View CV (PDF)</span>
             </a>
             <a href="devops_fr_CA.pdf" class="cv-button fr" download>
-                <span class="flag">🇫🇷</span>
+                <span class="flag">⚜️</span>
                 <span class="label">Français</span>
                 <span class="description">Voir CV (PDF)</span>
             </a>
@@ -211,11 +211,8 @@
     </div>
 
     <script>
-        // Update the last updated date from git commit info
-        // This will be populated by the GitHub Actions workflow
         const updateDate = document.getElementById('updateDate');
         
-        // Try to fetch the build info from a JSON file if available
         fetch('build-info.json')
             .then(response => response.json())
             .then(data => {
@@ -229,7 +226,6 @@
                 }
             })
             .catch(() => {
-                // Fallback to today's date if build-info.json not available
                 const today = new Date();
                 updateDate.textContent = today.toLocaleDateString('en-US', { 
                     year: 'numeric', 

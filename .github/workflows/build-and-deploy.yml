@@ -23,10 +23,7 @@ jobs:
           sudo apt-get install -y texlive-full latexmk
 
       - name: Build PDFs
-        run: |
-          make clean
-          make all
-          ls -lh *.pdf
+        run: make all
 
       - name: Create deployment files
         run: |
@@ -34,8 +31,6 @@ jobs:
           cp index.html _deploy/
           cp *.pdf _deploy/
           cp .nojekyll _deploy/
-          echo "Files ready for deployment:"
-          ls -lh _deploy/
 
       - name: Commit and push PDFs
         run: |
