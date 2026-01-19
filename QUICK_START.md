@@ -19,6 +19,8 @@ Visit: https://github.com/GHostQC/curriculum-vitae/settings/pages
 - **Build and deployment > Source**: Select **"GitHub Actions"**
 - Click **Save** (if prompted)
 
+⚠️ **Important**: Make sure the source is set to **"GitHub Actions"** (not "Deploy from a branch" or "None")
+
 ### 2. Enable Workflow Permissions
 
 Visit: https://github.com/GHostQC/curriculum-vitae/settings/actions/general
@@ -27,6 +29,8 @@ Visit: https://github.com/GHostQC/curriculum-vitae/settings/actions/general
 - ☑️ Enable **"Read and write permissions"**
 - ☑️ Enable **"Allow GitHub Actions to create and approve pull requests"**
 - Click **Save**
+
+⚠️ **Important**: This allows the workflow to both build PDFs and commit them back to your repo
 
 ### 3. Watch the First Build
 
