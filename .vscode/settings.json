@@ -1,5 +1,6 @@
 {
   "github-actions.workflows.pinned.workflows": [
-    ".github/workflows/build-and-deploy.yml"
+    ".github/workflows/gh-page-build-and-deploy.yml",
+    ".github/workflows/semantic-gh-release.yml"
   ]
 }
