@@ -5,3 +5,6 @@
 *.log
 *.out
 *.run.xml
+
+# Built locally; CI builds and publishes the PDFs to GitHub Pages
+*.pdf
