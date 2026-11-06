@@ -21,13 +21,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install LaTeX
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y texlive-full latexmk
-
+      # Same image as local builds; pulling it takes minutes vs ~1h for apt texlive-full
       - name: Build PDFs
-        run: make all
+        run: |
+          docker run --rm -u "$(id -u):$(id -g)" -v "$PWD:/w" -w /w \
+            texlive/texlive:latest make all
 
       - name: Create deployment files
         run: |
@@ -35,18 +33,6 @@ jobs:
           cp index.html _deploy/
           cp *.pdf _deploy/
           cp .nojekyll _deploy/
-
-      - name: Commit and push PDFs
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          if git diff --quiet *.pdf; then
-            echo "No PDF changes"
-          else
-            git add *.pdf
-            git commit -m "build: regenerate PDFs" || true
-            git push || true
-          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
